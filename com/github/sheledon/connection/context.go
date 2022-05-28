@@ -7,10 +7,10 @@ import (
 type ConnectContext struct {
 	readBuffer *buffer.ReadBuffer
 	writer     *bufio.Writer
-	conn       *rpcConnection
+	conn       *RpcConnection
 	Obj        interface{}
 }
-func NewConnectContext(conn *rpcConnection) *ConnectContext{
+func NewConnectContext(conn *RpcConnection) *ConnectContext{
 	return &ConnectContext{
 		conn:       conn,
 		readBuffer: buffer.NewReadBuffer(conn.conn),

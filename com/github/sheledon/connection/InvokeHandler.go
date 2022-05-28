@@ -1,7 +1,6 @@
 package connection
 
 import (
-	"fmt"
 	"go-rpc/com/github/sheledon/entity"
 	"go-rpc/com/github/sheledon/service"
 	"reflect"
@@ -10,7 +9,6 @@ import (
 type InvokeHandler struct {
 	provider *service.Provider
 }
-
 func NewInvokeHandler() *InvokeHandler{
 	return &InvokeHandler{
 		provider: service.ServiceProvier,
@@ -26,10 +24,7 @@ func (h *InvokeHandler) Read(context *ConnectContext)  {
 	}
 	instance := reflect.ValueOf(svice)
 	method := instance.MethodByName(request.MethodName)
-	res := h.invokeMethod(method, request.Params)
-	for _,v := range res {
-		fmt.Println(v.String())
-	}
+	h.invokeMethod(method, request.Params)
 }
 func (h *InvokeHandler) invokeMethod(method reflect.Value,params []interface{}) []reflect.Value{
 	vparams := make([]reflect.Value, len(params))

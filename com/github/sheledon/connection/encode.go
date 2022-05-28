@@ -36,8 +36,6 @@ func (h *EncodeHandler) Write(ctx *ConnectContext, msg *entity.RpcMessage)  {
 	ctx.WriteBytes(TransferInt64ToBytes(h.idUtils.getAndAdd()))
 	ctx.Write(msg.MessageType)
 	headLen := msg.HeadLength
-	//request := entity.NewRpcRequest("123","user","hello")
-	//bodyBytes,_ := json.Marshal(request)
 	bodyBytes,_:= h.encoder.Serialize(msg.Body)
 	contLen := headLen + int64(len(bodyBytes))
 	ctx.WriteBytes(TransferInt64ToBytes(contLen))

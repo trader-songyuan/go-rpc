@@ -35,7 +35,7 @@ func NewRpcRequest(id,serviceName,methodName string,params ...interface{}) RpcRe
 type RpcResponse struct {
 	Id string
 	ServiceName string
-	Body interface{}
+	Body []interface{}
 }
 
 func NewRpcMessage(msgType byte) *RpcMessage {

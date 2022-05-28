@@ -15,7 +15,6 @@ func NewRpcServer(address string) *RpcServer {
 	return &RpcServer{
 		address: address,
 		conPool: connection.NewConnectionPool(),
-
 	}
 }
 func (server *RpcServer) Listener(){
@@ -37,5 +36,5 @@ func (server *RpcServer) Listener(){
 	}
 }
 func (server *RpcServer) process(conn net.Conn){
-	server.conPool.AddConnection(conn)
+	server.conPool.AddConnection(conn).ProcessRequest()
 }

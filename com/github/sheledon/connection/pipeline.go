@@ -1,5 +1,7 @@
 package connection
 
+import "go-rpc/com/github/sheledon/entity"
+
 type Pipeline struct {
 	inboundHandlers []RpcInboundHandler
 	outboundHandlers []RpcOutboundHandler
@@ -23,5 +25,10 @@ func (p *Pipeline) addOutboundHandler(handler RpcOutboundHandler){
 func (p *Pipeline) processRequest(ctx *ConnectContext) {
 	for _,h := range p.inboundHandlers{
 		h.Read(ctx)
+	}
+}
+func (p *Pipeline) sendRequest(ctx *ConnectContext,msg *entity.RpcMessage) {
+	for _,h := range p.outboundHandlers{
+		h.Write(ctx,msg)
 	}
 }
