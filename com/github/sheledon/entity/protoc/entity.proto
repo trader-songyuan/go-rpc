@@ -1,0 +1,9 @@
+syntax = "proto3";
+package protoc;
+option go_package = "./entity";
+// 测试使用的struct
+message Student {
+    string name = 1;
+    int32 age = 2;
+    float money = 3;
+}

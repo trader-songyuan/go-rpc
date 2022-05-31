@@ -1,17 +1,41 @@
 syntax = "proto3";
 package entity;
-option go_package = "./entity";
+option go_package = "../protoc";
 import "google/protobuf/any.proto";
 message RpcRequest {
     string id = 1;
     string service_name = 2;
     string method_name = 3;
-    repeated google.protobuf.Any params = 4;
+    repeated RpcAny params = 4;
 }
 message RpcResponse {
     string id = 1;
     string service_name = 2;
     int32 code = 3;
-    repeated google.protobuf.Any body = 4;
-    google.protobuf.Any err = 5;
+    string err = 4;
+    repeated RpcAny body = 5;
+}
+message RpcAny {
+    AnyOriginalType type = 1;
+    AnyOriginalType eleType = 2;
+    repeated google.protobuf.Any value = 3;
+}
+enum AnyOriginalType {
+    STRING=0;
+    INT_8 = 1;
+    INT_16 = 2;
+    INT_32 = 3;
+    INT_64 = 4;
+    UINT_8 = 5;
+    UINT_16 = 6;
+    UINT_32 = 7;
+    UINT_64 = 8;
+    FLOAT_32 = 9;
+    FLOAT_64 = 10;
+    BOOL = 11;
+    STRUCT = 12;
+    BYTE = 13;
+    MAP = 14;
+    SLICE = 15;
+    ARRAY = 16;
 }
