@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/binary"
 	"go-rpc/com/github/sheledon/entity"
-	"go-rpc/com/github/sheledon/utils/serializer"
+	"google.golang.org/protobuf/proto"
 	"sync"
 )
-
+/**
+	出站编码器：rpcMessage ---> 大端序列字节流
+ */
 type atomic struct {
 	mutex sync.Mutex
 	num int64
@@ -20,12 +22,10 @@ func (a *atomic) getAndAdd() int64{
 	return a.num
 }
 type EncodeHandler struct {
-	encoder serializer.Serializer
 	idUtils *atomic
 }
 func NewEncodeHandler() *EncodeHandler {
 	return &EncodeHandler{
-		encoder: serializer.NewDefaultSerializer(),
 		idUtils: new(atomic),
 	}
 }
@@ -36,7 +36,7 @@ func (h *EncodeHandler) Write(ctx *ConnectContext, msg *entity.RpcMessage)  {
 	ctx.WriteBytes(TransferInt64ToBytes(h.idUtils.getAndAdd()))
 	ctx.Write(msg.MessageType)
 	headLen := msg.HeadLength
-	bodyBytes,_:= h.encoder.Serialize(msg.Body)
+	bodyBytes,_:= proto.Marshal(msg.Body)
 	contLen := headLen + int64(len(bodyBytes))
 	ctx.WriteBytes(TransferInt64ToBytes(contLen))
 	ctx.WriteBytes(TransferInt64ToBytes(headLen))

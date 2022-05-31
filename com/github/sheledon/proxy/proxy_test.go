@@ -24,10 +24,6 @@ func TestReflect(t *testing.T)  {
 		fmt.Println("后置处理")
 		return []reflect.Value{reflect.ValueOf(10),reflect.ValueOf("a")}
 	})
-	//proxy.SayHello("fdsa")
-	//id, s := proxy.GetNameById("fdsa")
-	//fmt.Println(id)
-	//fmt.Println(s)
 	person.GetNameById("trewtrew")
 }
 func TestUUID(t *testing.T)  {

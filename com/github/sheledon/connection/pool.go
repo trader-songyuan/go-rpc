@@ -1,10 +1,8 @@
-package a
+package connection
 
 import (
 	"errors"
-	"go-rpc/com/github/sheledon/connection"
 	"go-rpc/com/github/sheledon/entity"
-	"go-rpc/com/github/sheledon/handler"
 	"log"
 	"net"
 )
@@ -14,8 +12,8 @@ type Pool struct {
 }
 type RpcConnection struct {
 	Conn        net.Conn
-	connContext *connection.ConnectContext
-	pipeline    *handler.Pipeline
+	connContext *ConnectContext
+	pipeline    *Pipeline
 }
 func NewConnectionPool() *Pool {
 	return &Pool{
@@ -26,9 +24,9 @@ func NewRpcConnection(conn net.Conn) *RpcConnection {
 	log.Printf("create new rpcConnection : %s",conn.RemoteAddr())
 	rc := &RpcConnection{
 		Conn:     conn,
-		pipeline: handler.NewDefaultPipeline(),
+		pipeline: NewDefaultPipeline(),
 	}
-	rc.connContext = connection.NewConnectContext(rc)
+	rc.connContext = NewConnectContext(rc)
 	return rc
 }
 func (r *RpcConnection) close()  {
@@ -52,9 +50,9 @@ func (cp *Pool) GetConnection(addr string)  (rc *RpcConnection,err error) {
 	}
 	return
 }
-func (r *RpcConnection) ProcessRequest(){
-	r.pipeline.ProcessRequest(r.connContext)
+func (r *RpcConnection) ProcessRead(){
+	r.pipeline.ProcessRead(r.connContext)
 }
-func (r *RpcConnection) SendMsg(msg *entity.RpcMessage){
-	r.pipeline.SendRequest(r.connContext,msg)
+func (r *RpcConnection) ProcessWrite(msg *entity.RpcMessage){
+	r.pipeline.ProcessWrite(r.connContext,msg)
 }

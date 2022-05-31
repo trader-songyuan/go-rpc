@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"go-rpc/com/github/sheledon/constant"
 	"go-rpc/com/github/sheledon/entity"
-	"go-rpc/com/github/sheledon/utils/serializer"
+	"go-rpc/com/github/sheledon/entity/protoc"
+	"google.golang.org/protobuf/proto"
 )
-
+/**
+	入站解码器 : 大端序列字节流 ---> rpcMessage
+ */
 type DecodeHandler struct {
-	decoder serializer.Serializer
 }
 func NewDecodeHandler() *DecodeHandler {
-	return &DecodeHandler{
-		decoder: serializer.NewDefaultSerializer(),
-	}
+	return &DecodeHandler{}
 }
 func (h DecodeHandler) Read(context *ConnectContext) {
 	magicNumber, _ := context.ReadBuffer.ReadByte()
@@ -23,14 +23,16 @@ func (h DecodeHandler) Read(context *ConnectContext) {
 	contentLength, _ := context.ReadBuffer.ReadInt64()
 	headLength, _ := context.ReadBuffer.ReadInt64()
 	bodyLen := contentLength - headLength
-	bodyEntity := getMsgBodyByType(msgType)
-	if bodyLen > 0 {
-		bodyBytes := context.ReadBuffer.Read(int(bodyLen))
-		h.decoder.Deserialize(bodyBytes, bodyEntity)
-	}
+	rpcMessage := CreateRpcMessage(id, contentLength, headLength, msgType)
+	setMsgBodyByType(rpcMessage)
 	checkMagicNumber(magicNumber)
 	checkVersion(version)
-	rpcMessage := CreateRpcMessage(id, contentLength, headLength, bodyEntity)
+	if bodyLen > 0 {
+		bodyBytes := context.ReadBuffer.Read(int(bodyLen))
+		if err := proto.Unmarshal(bodyBytes, rpcMessage.Body);err!=nil{
+			panic(err)
+		}
+	}
 	context.AddAttr(constant.RPC_MESSAGE,rpcMessage)
 }
 func checkMagicNumber(mn byte) error{
@@ -45,21 +47,19 @@ func checkVersion(version byte) error{
 	}
 	return nil
 }
-func CreateRpcMessage(id,contentLength,headLength int64,body interface{}) *entity.RpcMessage{
-	message := entity.NewDefaultRpcMessage()
+func CreateRpcMessage(id,contentLength,headLength int64,msgType byte) *entity.RpcMessage{
+	message := entity.NewRpcMessage(msgType)
 	message.ContentLength = contentLength
 	message.HeadLength = headLength
-	message.Body = body
 	message.Id = id
+	message.MessageType = msgType
 	return message
 }
-func getMsgBodyByType(btype byte) interface{}{
-	switch btype {
+func setMsgBodyByType(rpcMessage *entity.RpcMessage){
+	switch rpcMessage.MessageType {
 	case constant.RPC_REQUEST:
-		return new(entity.RpcRequest)
+		rpcMessage.Body = &protoc.RpcRequest{}
 	case constant.RPC_RESPONSE:
-		return new(entity.RpcResponse)
-	default:
-		return nil
+		rpcMessage.Body = &protoc.RpcResponse{}
 	}
 }

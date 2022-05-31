@@ -1,18 +1,17 @@
-package context
+package connection
 
 import (
 	"bufio"
 	"go-rpc/com/github/sheledon/buffer"
-	"go-rpc/com/github/sheledon/connection"
 	"go-rpc/com/github/sheledon/entity"
 )
 type ConnectContext struct {
 	ReadBuffer *buffer.ReadBuffer
 	writer     *bufio.Writer
-	conn       *connection.RpcConnection
+	conn       *RpcConnection
 	Attr       map[string]interface{}
 }
-func NewConnectContext(conn *connection.RpcConnection) *ConnectContext {
+func NewConnectContext(conn *RpcConnection) *ConnectContext {
 	return &ConnectContext{
 		conn:       conn,
 		ReadBuffer: buffer.NewReadBuffer(conn.Conn),
@@ -43,5 +42,5 @@ func (ctx *ConnectContext) GetAttr(key string) interface{}{
 	return nil
 }
 func (ctx *ConnectContext) SendRequest(msg *entity.RpcMessage) {
-	ctx.conn.SendMsg(msg)
+	ctx.conn.ProcessWrite(msg)
 }

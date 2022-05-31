@@ -1,13 +1,12 @@
-package handler
+package connection
 
 import (
-	"go-rpc/com/github/sheledon/connection"
 	"go-rpc/com/github/sheledon/entity"
 )
 
 type RpcInboundHandler interface {
-	Read(*connection.ConnectContext)
+	Read(*ConnectContext)
 }
 type RpcOutboundHandler interface {
-	Write(*connection.ConnectContext,*entity.RpcMessage)
+	Write(*ConnectContext,*entity.RpcMessage)
 }

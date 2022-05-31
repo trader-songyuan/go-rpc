@@ -1,7 +1,6 @@
-package handler
+package connection
 
 import (
-	"go-rpc/com/github/sheledon/connection"
 	"go-rpc/com/github/sheledon/entity"
 )
 
@@ -31,12 +30,12 @@ func (p *Pipeline) addInboundHandler(handler RpcInboundHandler) {
 func (p *Pipeline) addOutboundHandler(handler RpcOutboundHandler){
 	p.outboundHandlers = append(p.outboundHandlers,handler)
 }
-func (p *Pipeline) ProcessRequest(ctx *connection.ConnectContext) {
+func (p *Pipeline) ProcessRead(ctx *ConnectContext) {
 	for _,h := range p.inboundHandlers{
 		h.Read(ctx)
 	}
 }
-func (p *Pipeline) SendRequest(ctx *connection.ConnectContext,msg *entity.RpcMessage) {
+func (p *Pipeline) ProcessWrite(ctx *ConnectContext,msg *entity.RpcMessage) {
 	for _,h := range p.outboundHandlers{
 		h.Write(ctx,msg)
 	}

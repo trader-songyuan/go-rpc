@@ -17,12 +17,12 @@ func (s student) GetHello(message string) string {
 }
 type myString string
 func TestNewProvider(t *testing.T) {
-	providers := NewProvider()
+	providers := newProvider()
 	stu := student{name: "hututu"}
 	const sname = "student"
-	err := providers.registerService(sname,stu)
+	err := providers.RegisterService(sname,stu)
 	shutdownTest(t,err)
-	service, err := providers.getService(sname)
+	service, err := providers.GetService(sname)
 	shutdownTest(t,err)
 	value :=reflect.ValueOf(service)
 	method := value.MethodByName("GoSchool")

@@ -2,14 +2,9 @@ package sheledon
 
 import (
 	"fmt"
-	"go-rpc/com/github/sheledon/connection"
-	"go-rpc/com/github/sheledon/constant"
-	"go-rpc/com/github/sheledon/entity"
 	server2 "go-rpc/com/github/sheledon/server"
 	"go-rpc/com/github/sheledon/service"
-	"net"
 	"testing"
-	"time"
 )
 
 type User struct {
@@ -27,18 +22,18 @@ func TestRpc(t *testing.T) {
 		server.Listener()
 	})
 	t.Run("client", func(t *testing.T) {
-		conn, err := net.Dial("tcp", "127.0.0.1:8080")
-		if err != nil{
-			t.Fatal("fail connect")
-		}
-		defer conn.Close()
-		request := entity.NewRpcRequest("123","user","Hello")
-		encoder := connection.NewEncodeHandler()
-		context := connection.NewConnectContext(connection.NewRpcConnection(conn))
-		rpcMessage := entity.NewRpcMessage(constant.RPC_REQUEST)
-		rpcMessage.Body = request
-		encoder.Write(context,rpcMessage)
-		time.Sleep(10000*time.Second)
+		//conn, err := net.Dial("tcp", "127.0.0.1:8080")
+		//if err != nil{
+		//	t.Fatal("fail connect")
+		//}
+		//defer conn.Close()
+		//request := entity.NewRpcRequest("123","user","Hello")
+		//encoder := connection.NewEncodeHandler()
+		//context := connection.NewConnectContext(connection.NewRpcConnection(conn))
+		//rpcMessage := entity.NewRpcMessage(constant.RPC_REQUEST)
+		//rpcMessage.Body = request
+		//encoder.Write(context,rpcMessage)
+		//time.Sleep(10000*time.Second)
 	})
 }
 

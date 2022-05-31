@@ -36,5 +36,5 @@ func (server *RpcServer) Listener(){
 	}
 }
 func (server *RpcServer) process(conn net.Conn){
-	server.conPool.AddConnection(conn).ProcessRequest()
+	server.conPool.AddConnection(conn).ProcessRead()
 }
