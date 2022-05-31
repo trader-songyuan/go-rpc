@@ -16,22 +16,22 @@ func NewDecodeHandler() *DecodeHandler {
 	}
 }
 func (h DecodeHandler) Read(context *ConnectContext) {
-	magicNumber, _ := context.readBuffer.ReadByte()
-	version, _ := context.readBuffer.ReadByte()
-	id, _ := context.readBuffer.ReadInt64()
-	msgType, _ := context.readBuffer.ReadByte()
-	contentLength, _ := context.readBuffer.ReadInt64()
-	headLength, _ := context.readBuffer.ReadInt64()
+	magicNumber, _ := context.ReadBuffer.ReadByte()
+	version, _ := context.ReadBuffer.ReadByte()
+	id, _ := context.ReadBuffer.ReadInt64()
+	msgType, _ := context.ReadBuffer.ReadByte()
+	contentLength, _ := context.ReadBuffer.ReadInt64()
+	headLength, _ := context.ReadBuffer.ReadInt64()
 	bodyLen := contentLength - headLength
 	bodyEntity := getMsgBodyByType(msgType)
 	if bodyLen > 0 {
-		bodyBytes := context.readBuffer.Read(int(bodyLen))
+		bodyBytes := context.ReadBuffer.Read(int(bodyLen))
 		h.decoder.Deserialize(bodyBytes, bodyEntity)
 	}
 	checkMagicNumber(magicNumber)
 	checkVersion(version)
-	rpcMessage := createRpcMessage(id, contentLength, headLength, bodyEntity)
-	context.SetObj(rpcMessage)
+	rpcMessage := CreateRpcMessage(id, contentLength, headLength, bodyEntity)
+	context.AddAttr(constant.RPC_MESSAGE,rpcMessage)
 }
 func checkMagicNumber(mn byte) error{
 	if constant.MAGIC_NUMBER != mn{
@@ -45,7 +45,7 @@ func checkVersion(version byte) error{
 	}
 	return nil
 }
-func createRpcMessage(id,contentLength,headLength int64,body interface{}) *entity.RpcMessage{
+func CreateRpcMessage(id,contentLength,headLength int64,body interface{}) *entity.RpcMessage{
 	message := entity.NewDefaultRpcMessage()
 	message.ContentLength = contentLength
 	message.HeadLength = headLength

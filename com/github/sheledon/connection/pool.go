@@ -1,8 +1,10 @@
-package connection
+package a
 
 import (
 	"errors"
+	"go-rpc/com/github/sheledon/connection"
 	"go-rpc/com/github/sheledon/entity"
+	"go-rpc/com/github/sheledon/handler"
 	"log"
 	"net"
 )
@@ -11,9 +13,9 @@ type Pool struct {
 	pool map[string]*RpcConnection
 }
 type RpcConnection struct {
-	conn net.Conn
-	connContext *ConnectContext
-	pipeline *Pipeline
+	Conn        net.Conn
+	connContext *connection.ConnectContext
+	pipeline    *handler.Pipeline
 }
 func NewConnectionPool() *Pool {
 	return &Pool{
@@ -23,19 +25,19 @@ func NewConnectionPool() *Pool {
 func NewRpcConnection(conn net.Conn) *RpcConnection {
 	log.Printf("create new rpcConnection : %s",conn.RemoteAddr())
 	rc := &RpcConnection{
-		conn:     conn,
-		pipeline: NewDefaultPipeline(),
+		Conn:     conn,
+		pipeline: handler.NewDefaultPipeline(),
 	}
-	rc.connContext = NewConnectContext(rc)
+	rc.connContext = connection.NewConnectContext(rc)
 	return rc
 }
 func (r *RpcConnection) close()  {
-	r.conn.Close()
+	r.Conn.Close()
 }
-func (cp *Pool) AddConnection(conn net.Conn) *RpcConnection{
+func (cp *Pool) AddConnection(conn net.Conn) *RpcConnection {
 	key := conn.RemoteAddr().String()
 	if oc,ok := cp.pool[key];ok{
-		if oc.conn != conn {
+		if oc.Conn != conn {
 			defer oc.close()
 		}
 	}else{
@@ -51,8 +53,8 @@ func (cp *Pool) GetConnection(addr string)  (rc *RpcConnection,err error) {
 	return
 }
 func (r *RpcConnection) ProcessRequest(){
-	r.pipeline.processRequest(r.connContext)
+	r.pipeline.ProcessRequest(r.connContext)
 }
 func (r *RpcConnection) SendMsg(msg *entity.RpcMessage){
-	r.pipeline.sendRequest(r.connContext,msg)
+	r.pipeline.SendRequest(r.connContext,msg)
 }

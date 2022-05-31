@@ -1,20 +1,29 @@
-package connection
+package handler
 
-import "go-rpc/com/github/sheledon/entity"
+import (
+	"go-rpc/com/github/sheledon/connection"
+	"go-rpc/com/github/sheledon/entity"
+)
 
 type Pipeline struct {
 	inboundHandlers []RpcInboundHandler
 	outboundHandlers []RpcOutboundHandler
 }
-func NewDefaultPipeline() *Pipeline{
+func NewDefaultPipeline() *Pipeline {
 	p := &Pipeline{
 		inboundHandlers: make([]RpcInboundHandler,0),
 		outboundHandlers: make([]RpcOutboundHandler,0),
 	}
-	p.addInboundHandler(NewDecodeHandler())
-	p.addInboundHandler(NewInvokeHandler())
-	p.addOutboundHandler(NewEncodeHandler())
+	p.initInboundHandlers()
+	p.initOutboundHandlers()
 	return p
+}
+func (p *Pipeline) initInboundHandlers() {
+	p.addInboundHandler(NewDecodeHandler())
+	p.addInboundHandler(NewDisPatchHandler())
+}
+func (p *Pipeline) initOutboundHandlers()  {
+	p.addOutboundHandler(NewEncodeHandler())
 }
 func (p *Pipeline) addInboundHandler(handler RpcInboundHandler) {
 	p.inboundHandlers = append(p.inboundHandlers,handler)
@@ -22,12 +31,12 @@ func (p *Pipeline) addInboundHandler(handler RpcInboundHandler) {
 func (p *Pipeline) addOutboundHandler(handler RpcOutboundHandler){
 	p.outboundHandlers = append(p.outboundHandlers,handler)
 }
-func (p *Pipeline) processRequest(ctx *ConnectContext) {
+func (p *Pipeline) ProcessRequest(ctx *connection.ConnectContext) {
 	for _,h := range p.inboundHandlers{
 		h.Read(ctx)
 	}
 }
-func (p *Pipeline) sendRequest(ctx *ConnectContext,msg *entity.RpcMessage) {
+func (p *Pipeline) SendRequest(ctx *connection.ConnectContext,msg *entity.RpcMessage) {
 	for _,h := range p.outboundHandlers{
 		h.Write(ctx,msg)
 	}

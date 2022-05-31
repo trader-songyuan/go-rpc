@@ -1,20 +1,23 @@
-package connection
+package context
 
 import (
 	"bufio"
 	"go-rpc/com/github/sheledon/buffer"
+	"go-rpc/com/github/sheledon/connection"
+	"go-rpc/com/github/sheledon/entity"
 )
 type ConnectContext struct {
-	readBuffer *buffer.ReadBuffer
+	ReadBuffer *buffer.ReadBuffer
 	writer     *bufio.Writer
-	conn       *RpcConnection
-	Obj        interface{}
+	conn       *connection.RpcConnection
+	Attr       map[string]interface{}
 }
-func NewConnectContext(conn *RpcConnection) *ConnectContext{
+func NewConnectContext(conn *connection.RpcConnection) *ConnectContext {
 	return &ConnectContext{
 		conn:       conn,
-		readBuffer: buffer.NewReadBuffer(conn.conn),
-		writer:     bufio.NewWriter(conn.conn),
+		ReadBuffer: buffer.NewReadBuffer(conn.Conn),
+		writer:     bufio.NewWriter(conn.Conn),
+		Attr:       make(map[string]interface{}),
 	}
 }
 func (ctx *ConnectContext) WriteBytesAndFlushed(bytes []byte) {
@@ -30,9 +33,15 @@ func (ctx *ConnectContext) Write(b byte)  {
 func (ctx *ConnectContext) Flush() {
 	ctx.writer.Flush()
 }
-func (ctx *ConnectContext) SetObj(obj interface{})  {
-	ctx.Obj = obj
+func (ctx *ConnectContext) AddAttr(key string,value interface{})  {
+	ctx.Attr[key] = value
 }
-func (ctx *ConnectContext) GetObj() interface{}{
-	return ctx.Obj
+func (ctx *ConnectContext) GetAttr(key string) interface{}{
+	if attr,ok := ctx.Attr[key]; ok{
+		return attr
+	}
+	return nil
+}
+func (ctx *ConnectContext) SendRequest(msg *entity.RpcMessage) {
+	ctx.conn.SendMsg(msg)
 }

@@ -1,0 +1,17 @@
+syntax = "proto3";
+package entity;
+option go_package = "./entity";
+import "google/protobuf/any.proto";
+message RpcRequest {
+    string id = 1;
+    string service_name = 2;
+    string method_name = 3;
+    repeated google.protobuf.Any params = 4;
+}
+message RpcResponse {
+    string id = 1;
+    string service_name = 2;
+    int32 code = 3;
+    repeated google.protobuf.Any body = 4;
+    google.protobuf.Any err = 5;
+}

@@ -2,17 +2,15 @@ package client
 
 import (
 	"errors"
-	"go-rpc/com/github/sheledon/entity"
 	"reflect"
 	"time"
 )
-
 /**
 client 网络相关
 */
 type UnProcessRequestFactory struct {
 	// key : id
-	promiseMap map[string]Promise
+	promiseMap map[string]*Promise
 }
 type Promise struct {
 	successChannel chan interface{}
@@ -50,22 +48,22 @@ func (p Promise) close()  {
 	close(p.successChannel)
 	close(p.failChanel)
 }
-func newUnProcessRequestFactory() UnProcessRequestFactory{
+func NewUnProcessRequestFactory() UnProcessRequestFactory {
 	return UnProcessRequestFactory{
-		promiseMap: make(map[string]Promise),
+		promiseMap: make(map[string]*Promise),
 	}
 }
-func (p Promise) Complete(response entity.RpcResponse) {
-	p.successChannel <-response
+func (p Promise) Complete(obj interface{}) {
+	p.successChannel <- obj
 }
 func (p Promise) CompleteFailure(err error) {
 	p.failChanel <- err
 }
 
 func (f UnProcessRequestFactory) Set(id string,promise Promise)  {
-	f.promiseMap[id] = promise
+	f.promiseMap[id] = &promise
 }
-func (f UnProcessRequestFactory) Get(id string) Promise{
+func (f UnProcessRequestFactory) Get(id string) *Promise {
 	p,_ := f.promiseMap[id]
 	return p
 }
