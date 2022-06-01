@@ -5,6 +5,7 @@ import (
 	"go-rpc/com/github/sheledon/entity"
 	"log"
 	"net"
+	"runtime"
 )
 type Pool struct {
 	// key: remoteAddr value : connection
@@ -31,6 +32,7 @@ func NewRpcConnection(conn net.Conn) *RpcConnection {
 }
 func (r *RpcConnection) close()  {
 	r.Conn.Close()
+	runtime.Goexit()
 }
 func (cp *Pool) AddConnection(conn net.Conn) *RpcConnection {
 	key := conn.RemoteAddr().String()
@@ -41,6 +43,7 @@ func (cp *Pool) AddConnection(conn net.Conn) *RpcConnection {
 	}else{
 		cp.pool[key] = NewRpcConnection(conn)
 	}
+	go cp.pool[key].processRead()
 	return cp.pool[key]
 }
 func (cp *Pool) GetConnection(addr string)  (rc *RpcConnection,err error) {
@@ -50,8 +53,9 @@ func (cp *Pool) GetConnection(addr string)  (rc *RpcConnection,err error) {
 	}
 	return
 }
-func (r *RpcConnection) ProcessRead(){
+func (r *RpcConnection) processRead(){
 	for  {
+		r.connContext.ResetAttr()
 		r.pipeline.ProcessRead(r.connContext)
 	}
 }

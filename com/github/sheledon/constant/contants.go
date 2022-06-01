@@ -19,3 +19,6 @@ const (
 const (
 	RPC_MESSAGE = "rpcMessage"
 )
+const (
+	NETWORK = "tcp"
+)

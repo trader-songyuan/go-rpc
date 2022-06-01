@@ -6,6 +6,7 @@ import (
 	server2 "go-rpc/com/github/sheledon/server"
 	"go-rpc/com/github/sheledon/service"
 	"testing"
+	"time"
 )
 
 // 服务接口传递参数，对于struct必须传递指针，返回值也是如此
@@ -56,5 +57,6 @@ func TestClient(t *testing.T)  {
 		student := sc.GetByName(&protoc.Student{Name: "123", Age: 10, Money: 1000}, -1,10,29,"zhangsan")
 		fmt.Println(student.Name)
 		sc.GetByName2(10,19,10.9,18.9,false)
+		time.Sleep(1000*time.Second)
 	})
 }

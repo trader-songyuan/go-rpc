@@ -2,6 +2,7 @@ package buffer
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/binary"
 	"io"
 )
@@ -20,19 +21,26 @@ func NewReadBuffer(reader io.Reader) *ReadBuffer{
 }
 func (bb *ReadBuffer) ReadByte() (res byte,err error){
 	if bb.readIndex >= bb.len {
-		bb.Grow()
+		err = bb.Grow()
+		if err != nil {
+			return
+		}
 	}
 	res = bb.buffer[bb.readIndex]
 	bb.readIndex++
 	return
 }
 func (bb *ReadBuffer) ReadInt64() (int64,error){
-	reb := bb.Read(8)
-	u := binary.BigEndian.Uint64(reb)
-	return int64(u),nil
-	//return int64(binary.BigEndian.Uint64(bb.Read(64))),nil
+	reb,err := bb.Read(8)
+	if err != nil {
+		return 0,err
+	}
+	bytesBuffer := bytes.NewBuffer(reb)
+	var x int64
+	err = binary.Read(bytesBuffer, binary.BigEndian, &x)
+	return x,err
 }
-func (bb *ReadBuffer) Read(lens int) (reb []byte){
+func (bb *ReadBuffer) Read(lens int) (reb []byte,err error){
 	reqLen := lens
 	if bb.IsReadable() {
 		start,end := bb.readIndex ,bb.readIndex + lens
@@ -46,8 +54,15 @@ func (bb *ReadBuffer) Read(lens int) (reb []byte){
 		bb.readIndex = end
 	}
 	if reqLen > 0{
-		bb.Grow()
-		reb = append(reb,bb.Read(reqLen)...)
+		err = bb.Grow()
+		if err != nil {
+			return
+		}
+		bs, errs := bb.Read(reqLen)
+		if errs != nil {
+			return nil,errs
+		}
+		reb = append(reb,bs...)
 	}
 	return
 }

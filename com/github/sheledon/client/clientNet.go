@@ -39,13 +39,16 @@ func (cl *Client) GetConnection(addr string) *connection.RpcConnection {
 		if conn,err = cl.pool.GetConnection(addr); err!=nil || conn==nil{
 			con,err := cl.connect(addr) // todo 重试逻辑
 			fmt.Println(err)
-			rpcConnection := cl.pool.AddConnection(con)
-			go rpcConnection.ProcessRead()
+			cl.pool.AddConnection(con)
 		}
 	}
 	rc, _ := cl.pool.GetConnection(addr)
 	return rc
 }
 func (cl *Client) connect(addr string) (net.Conn,error){
-	return net.Dial("tcp", addr)
+	tcpAddr, err := net.ResolveTCPAddr(constant.NETWORK, addr)
+	if err != nil {
+		return nil,err
+	}
+	return net.DialTCP(constant.NETWORK,nil,tcpAddr)
 }

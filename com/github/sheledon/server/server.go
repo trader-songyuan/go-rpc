@@ -3,22 +3,27 @@ package server
 import (
 	"fmt"
 	"go-rpc/com/github/sheledon/connection"
+	"go-rpc/com/github/sheledon/constant"
 	"log"
 	"net"
 )
 const tcp = "tcp"
 type RpcServer struct {
-	address string
+	address *net.TCPAddr
 	conPool *connection.Pool
 }
 func NewRpcServer(address string) *RpcServer {
+	tcpAddr, err := net.ResolveTCPAddr(constant.NETWORK, address)
+	if err != nil {
+		panic(err)
+	}
 	return &RpcServer{
-		address: address,
+		address: tcpAddr,
 		conPool: connection.NewConnectionPool(),
 	}
 }
 func (server *RpcServer) Listener(){
-	listen, err := net.Listen(tcp, server.address)
+	listen, err := net.ListenTCP(constant.NETWORK,server.address)
 	if err != nil {
 		panic(fmt.Sprintf("fail start server, err: %v",err))
 	} else {
@@ -32,9 +37,6 @@ func (server *RpcServer) Listener(){
 		} else {
 			log.Printf("accept connection,addr : %v \n",conn.RemoteAddr())
 		}
-		go server.process(conn)
+		go server.conPool.AddConnection(conn)
 	}
-}
-func (server *RpcServer) process(conn net.Conn){
-	server.conPool.AddConnection(conn).ProcessRead()
 }

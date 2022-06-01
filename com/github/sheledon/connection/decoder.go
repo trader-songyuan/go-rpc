@@ -16,19 +16,19 @@ func NewDecodeHandler() *DecodeHandler {
 	return &DecodeHandler{}
 }
 func (h DecodeHandler) Read(context *ConnectContext) {
-	magicNumber, _ := context.ReadBuffer.ReadByte()
-	version, _ := context.ReadBuffer.ReadByte()
-	id, _ := context.ReadBuffer.ReadInt64()
-	msgType, _ := context.ReadBuffer.ReadByte()
-	contentLength, _ := context.ReadBuffer.ReadInt64()
-	headLength, _ := context.ReadBuffer.ReadInt64()
+	magicNumber := context.ReadByte()
+	version := context.ReadByte()
+	id := context.ReadInt64()
+	msgType := context.ReadByte()
+	contentLength:= context.ReadInt64()
+	headLength:= context.ReadInt64()
 	bodyLen := contentLength - headLength
 	rpcMessage := CreateRpcMessage(id, contentLength, headLength, msgType)
 	setMsgBodyByType(rpcMessage)
 	checkMagicNumber(magicNumber)
 	checkVersion(version)
 	if bodyLen > 0 {
-		bodyBytes := context.ReadBuffer.Read(int(bodyLen))
+		bodyBytes := context.Read(int(bodyLen))
 		if err := proto.Unmarshal(bodyBytes, rpcMessage.Body);err!=nil{
 			panic(err)
 		}
