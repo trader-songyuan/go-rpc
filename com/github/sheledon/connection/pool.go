@@ -51,7 +51,9 @@ func (cp *Pool) GetConnection(addr string)  (rc *RpcConnection,err error) {
 	return
 }
 func (r *RpcConnection) ProcessRead(){
-	r.pipeline.ProcessRead(r.connContext)
+	for  {
+		r.pipeline.ProcessRead(r.connContext)
+	}
 }
 func (r *RpcConnection) ProcessWrite(msg *entity.RpcMessage){
 	r.pipeline.ProcessWrite(r.connContext,msg)

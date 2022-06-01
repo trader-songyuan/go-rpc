@@ -97,7 +97,12 @@ func RpcAnyToReflectValue(rpcAny *protoc.RpcAny)  reflect.Value{
 	var rv interface{}
 	switch rpcAny.Type {
 	case protoc.AnyOriginalType_STRING:
-		rv = string(rpcAny.Value[0].GetValue())
+		str := wrapperspb.String("")
+		err := rpcAny.Value[0].UnmarshalTo(str)
+		if err != nil {
+			panic(err)
+		}
+		rv = str.Value
 	case protoc.AnyOriginalType_INT_8:
 		w := wrapperspb.Int32(0)
 		err := rpcAny.Value[0].UnmarshalTo(w)
@@ -169,7 +174,12 @@ func RpcAnyToReflectValue(rpcAny *protoc.RpcAny)  reflect.Value{
 		}
 		rv = w.Value
 	case protoc.AnyOriginalType_BOOL:
-		rv , _ = strconv.ParseBool(string(rpcAny.Value[0].GetValue()))
+		str := wrapperspb.String("")
+		err := rpcAny.Value[0].UnmarshalTo(str)
+		if err != nil {
+			panic(err)
+		}
+		rv,_ = strconv.ParseBool(str.Value)
 	case protoc.AnyOriginalType_STRUCT:
 		rv ,_ = rpcAny.Value[0].UnmarshalNew()
 	//	支持这俩种类型又陷入了 如何将 interface{} ---> 具体类型的值 的问题

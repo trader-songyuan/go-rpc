@@ -55,6 +55,6 @@ func TestClient(t *testing.T)  {
 		RegisterRpcProxy("student",&sc)
 		student := sc.GetByName(&protoc.Student{Name: "123", Age: 10, Money: 1000}, -1,10,29,"zhangsan")
 		fmt.Println(student.Name)
-		//sc.GetByName2(10,19,10.9,18.9,true)
+		sc.GetByName2(10,19,10.9,18.9,false)
 	})
 }
