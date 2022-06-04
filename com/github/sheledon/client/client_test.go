@@ -11,7 +11,6 @@ import (
 
 // 服务接口传递参数，对于struct必须传递指针，返回值也是如此
 
-
 // 接口
 type GetByName func(stu *protoc.Student,i8 int8,i16 int16,i32 int32,name string) *protoc.Student
 type GetByName2 func(ui8 uint8,ui16 uint16,f32 float32,f64 float64,b bool)
@@ -43,17 +42,19 @@ type StuClient struct {
 	GetByName2
 	GetByName3
 }
-
 func TestClient(t *testing.T)  {
 	t.Run("server", func(t *testing.T) {
-		server := server2.NewRpcServer("127.0.0.1:8080")
-		provier := service.ServiceProvier
-		provier.RegisterService("student",StuVo{})
+		address := "127.0.0.1:8080"
+		server := server2.NewRpcServer(address)
+		server.SetRegister(service.NewZkRegister([]string{"127.0.0.1:2181"}))
+		server.RegisterService("provider1","student",StuVo{})
 		server.Listener()
 	})
 	t.Run("client", func(t *testing.T) {
 		sc := StuClient{}
-		RegisterRpcProxy("student",&sc)
+		client := NewRpcClient()
+		client.SetDiscovery(service.NewZkRegister([]string{"127.0.0.1:2181"}))
+		client.GenerateRpcProxy("student",&sc)
 		student := sc.GetByName(&protoc.Student{Name: "123", Age: 10, Money: 1000}, -1,10,29,"zhangsan")
 		fmt.Println(student.Name)
 		sc.GetByName2(10,19,10.9,18.9,false)

@@ -2,9 +2,9 @@ package connection
 
 import (
 	"fmt"
-	"go-rpc/com/github/sheledon/constant"
 	"go-rpc/com/github/sheledon/entity"
 	"go-rpc/com/github/sheledon/entity/protoc"
+	"go-rpc/com/github/sheledon/property/constant"
 	"google.golang.org/protobuf/proto"
 )
 /**
@@ -43,7 +43,7 @@ func checkMagicNumber(mn byte) error{
 }
 func checkVersion(version byte) error{
 	if constant.VERSION != version {
-		return fmt.Errorf("required version %d, receive version %d",constant.VERSION,version)
+		return fmt.Errorf("required version %d, receive version %d", constant.VERSION,version)
 	}
 	return nil
 }

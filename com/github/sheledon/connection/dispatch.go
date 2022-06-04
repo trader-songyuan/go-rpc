@@ -1,8 +1,8 @@
 package connection
 
 import (
-	"go-rpc/com/github/sheledon/constant"
 	"go-rpc/com/github/sheledon/entity"
+	"go-rpc/com/github/sheledon/property/constant"
 )
 // 根据 message 类型进行分发
 type DispatchHandler struct {}

@@ -2,9 +2,9 @@ package connection
 
 import (
 	"fmt"
-	"go-rpc/com/github/sheledon/constant"
 	"go-rpc/com/github/sheledon/entity"
 	"go-rpc/com/github/sheledon/entity/protoc"
+	"go-rpc/com/github/sheledon/property/constant"
 	"go-rpc/com/github/sheledon/service"
 	utils "go-rpc/com/github/sheledon/utils"
 	"reflect"
@@ -15,7 +15,7 @@ type RpcRequestStrategy struct {
 }
 func NewRpcRequestStrategy() RpcRequestStrategy {
 	return RpcRequestStrategy{
-		provider: service.ServiceProvier,
+		provider: service.GetProvider("127.0.0.1:8080"),
 	}
 }
 func (s RpcRequestStrategy) Handle(ctx *ConnectContext) {
@@ -38,13 +38,13 @@ func (s RpcRequestStrategy) Handle(ctx *ConnectContext) {
 	var rpcResponse protoc.RpcResponse
 	if err != nil {
 		panic(err)
-		rpcResponse = createRpcResponse(request,nil,err.Error(),constant.INVOKE_ERROR)
+		rpcResponse = createRpcResponse(request,nil,err.Error(), constant.INVOKE_ERROR)
 	} else {
 		ares := make([]*protoc.RpcAny,len(res))
 		for i,r := range res{
 			ares[i] = utils.ValueTransferToRpcAny(r)
 		}
-		rpcResponse = createRpcResponse(request,ares,"nil",constant.SUCCESS)
+		rpcResponse = createRpcResponse(request,ares,"nil", constant.SUCCESS)
 	}
 	message = entity.NewRpcMessage(constant.RPC_RESPONSE)
 	message.Body = &rpcResponse

@@ -1,7 +1,7 @@
 package entity
 
 import (
-	"go-rpc/com/github/sheledon/constant"
+	"go-rpc/com/github/sheledon/property/constant"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -17,8 +17,8 @@ type RpcMessage struct {
 func NewRpcMessage(msgType byte) *RpcMessage {
 	return &RpcMessage{
 		MagicNumber: constant.MAGIC_NUMBER,
-		Version: constant.VERSION,
-		HeadLength: constant.HEAD_LENGTH,
+		Version:     constant.VERSION,
+		HeadLength:  constant.HEAD_LENGTH,
 		MessageType: msgType,
 	}
 }

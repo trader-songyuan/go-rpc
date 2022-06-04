@@ -1,22 +1,42 @@
 package service
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 // 服务提供类，服务端调用
-var ServiceProvier = newProvider()
+var pmap = make(map[string]*Provider)
+var lock sync.Mutex
 type Provider struct {
 	servicesContainer map[string]interface{}
+	register *ZkRegister
+	serverAddress string
 }
-func newProvider() *Provider {
-	return &Provider{
-		servicesContainer: make(map[string]interface{}),
+func GetProvider(serverAddress string) *Provider {
+	if _,ok := pmap[serverAddress];!ok {
+		lock.Lock()
+		defer lock.Unlock()
+		if _,ok = pmap[serverAddress];!ok {
+			pmap[serverAddress] = &Provider{
+				servicesContainer: make(map[string]interface{}),
+				serverAddress: serverAddress,
+			}
+		}
 	}
+	return pmap[serverAddress]
 }
-func (p *Provider) RegisterService(name string,v interface{}) error{
-	if _,ok := p.servicesContainer[name];ok{
-		return fmt.Errorf("service %s already exists",name)
+func (p *Provider) SetRegister(register *ZkRegister){
+	p.register = register
+}
+func (p *Provider) RegisterService(providerName string,serviceName string,v interface{}) error{
+	if _,ok := p.servicesContainer[serviceName];ok{
+		return fmt.Errorf("service %s already exists", serviceName)
 	}
-	p.servicesContainer[name] = v
+	if p.register != nil {
+		p.register.RegisterService(providerName,serviceName,p.serverAddress)
+	}
+	p.servicesContainer[serviceName] = v
 	return nil
 }
 func (p *Provider) GetService(name string) (interface{},error){

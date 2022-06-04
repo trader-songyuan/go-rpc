@@ -3,14 +3,15 @@ package server
 import (
 	"fmt"
 	"go-rpc/com/github/sheledon/connection"
-	"go-rpc/com/github/sheledon/constant"
+	"go-rpc/com/github/sheledon/property/constant"
+	"go-rpc/com/github/sheledon/service"
 	"log"
 	"net"
 )
-const tcp = "tcp"
 type RpcServer struct {
 	address *net.TCPAddr
 	conPool *connection.Pool
+	provider *service.Provider
 }
 func NewRpcServer(address string) *RpcServer {
 	tcpAddr, err := net.ResolveTCPAddr(constant.NETWORK, address)
@@ -20,7 +21,14 @@ func NewRpcServer(address string) *RpcServer {
 	return &RpcServer{
 		address: tcpAddr,
 		conPool: connection.NewConnectionPool(),
+		provider: service.GetProvider(address),
 	}
+}
+func (server *RpcServer) SetRegister(r *service.ZkRegister) {
+	server.provider.SetRegister(r)
+}
+func (server *RpcServer) RegisterService(providerName,serviceName string,target interface{})  {
+	server.provider.RegisterService(providerName,serviceName,target)
 }
 func (server *RpcServer) Listener(){
 	listen, err := net.ListenTCP(constant.NETWORK,server.address)

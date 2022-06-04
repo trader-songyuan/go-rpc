@@ -21,4 +21,5 @@ const (
 )
 const (
 	NETWORK = "tcp"
+	SERVER_PORT = "29880"
 )

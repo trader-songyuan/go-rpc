@@ -1,10 +1,16 @@
 package loadbalance
 
-// 循环负载均衡
+import (
+	"math/rand"
+	"time"
+)
 
-type Rolling struct {
-	
-}
-func (r Rolling) Select(list []interface{}) interface{}{
-	return 0
+// 循环负载均衡
+type Random struct {}
+func (r Random) Select(sname string,addresses []string) string{
+	rand.Seed(time.Now().UnixNano())
+	n := rand.Int31n(int32(len(addresses)))
+	n++
+	pos := int32(len(addresses)) % n
+	return addresses[pos]
 }

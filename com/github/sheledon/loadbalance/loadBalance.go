@@ -1,5 +1,5 @@
 package loadbalance
 
 type LoadBalance interface {
-	Select()
+	Select(serviceName string,addresses []string) string
 }

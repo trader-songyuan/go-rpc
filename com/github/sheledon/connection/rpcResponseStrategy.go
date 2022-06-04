@@ -1,9 +1,9 @@
 package connection
 
 import (
-	"go-rpc/com/github/sheledon/constant"
 	"go-rpc/com/github/sheledon/entity"
 	"go-rpc/com/github/sheledon/entity/protoc"
+	"go-rpc/com/github/sheledon/property/constant"
 	"go-rpc/com/github/sheledon/unprocess"
 )
 
